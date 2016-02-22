@@ -20,7 +20,15 @@
                         <td><a href="{crmURL p='civicrm/pcp/info' q="reset=1&id=`$page.id`" fe='true'}" title="{ts}View Personal Campaign Page{/ts}" target="_blank">{$page.title}</a></td>
                         <td>{$page.status}</td>
                         <td>{$page.page_title}</td>
-                        <td>{$page.number_of_contributions}</td>
+                        <td>
+                            {if isset($page.contribution_page_id) }
+                            <a href="{crmURL p='civicrm/contribute/search' q="reset=1&force=1&pid=`$page.page_id`" fe='true'}" title="{ts}View Contributions{/ts}">
+                                {$page.number_of_contributions}
+                            </a>
+                            {else}
+                                {$page.number_of_contributions}
+                            {/if}
+                        </td>
                         <td>{$page.amount_raised|crmMoney}</td>
                         <td>{$page.goal_amount|crmMoney}</td>
                         <td class="nowrap">{$page.actions}</td>

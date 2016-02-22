@@ -27,11 +27,13 @@ class CRM_Pcpcontacttab_Page_PersonalCampaignPages extends CRM_Core_Page {
         pcp.page_type,
         COALESCE(cp.title, e.title) as page_title,
         COUNT(cs.id) as number_of_contributions,
-        SUM(cs.amount) as amount_raised
+        SUM(cs.amount) as amount_raised,
+        c.contribution_page_id
       FROM civicrm_pcp pcp
         LEFT JOIN civicrm_contribution_page cp ON pcp.page_id = cp.id AND pcp.page_type = 'contribute'
         LEFT JOIN civicrm_event e ON pcp.page_id = e.id AND pcp.page_type = 'event'
         LEFT JOIN civicrm_contribution_soft cs ON pcp.id = cs.pcp_id
+        LEFT JOIN civicrm_contribution c ON cs.contribution_id = c.id
       WHERE pcp.contact_id = %0
       GROUP BY pcp.id
     ", $params);
@@ -47,7 +49,8 @@ class CRM_Pcpcontacttab_Page_PersonalCampaignPages extends CRM_Core_Page {
         'page_title' => $result->page_title,
         'number_of_contributions' => $result->number_of_contributions,
         'amount_raised' => is_null($result->amount_raised) ? 0 : $result->amount_raised,
-        'actions' => CRM_Core_Action::formLink($links, $action, array('id' => $result->id))
+        'actions' => CRM_Core_Action::formLink($links, $action, array('id' => $result->id)),
+        'contribution_page_id' => $result->contribution_page_id
       );
     }
     $this->assign('pages', $pages);
