@@ -26,14 +26,14 @@ class CRM_Pcpcontacttab_Page_PersonalCampaignPages extends CRM_Core_Page {
         pcp.page_id,
         pcp.page_type,
         COALESCE(cp.title, e.title) as page_title,
-        COUNT(c.id) as number_of_contributions,
-        SUM(c.total_amount) as amount_raised
+        COUNT(cs.id) as number_of_contributions,
+        SUM(cs.amount) as amount_raised
       FROM civicrm_pcp pcp
         LEFT JOIN civicrm_contribution_page cp ON pcp.page_id = cp.id AND pcp.page_type = 'contribute'
         LEFT JOIN civicrm_event e ON pcp.page_id = e.id AND pcp.page_type = 'event'
-        LEFT JOIN civicrm_contribution c ON c.contribution_page_id = cp.id
+        LEFT JOIN civicrm_contribution_soft cs ON pcp.id = cs.pcp_id
       WHERE pcp.contact_id = %0
-      GROUP BY cp.id
+      GROUP BY pcp.id
     ", $params);
     $pages = array();
     while($result->fetch()) {
