@@ -1,0 +1,36 @@
+civicrm_pcp:
+  -
+    id: 9990
+    contact_id: 9999
+    status_id: 2 #Approved
+    title: Test PCP 9990
+    intro_text: Test
+    page_text: Test
+    donate_link_text: Donate
+    page_id: 1
+    page_type: contribute
+    pcp_block_id: 9999
+    is_thermometer: 1
+    is_honor_roll: 1
+    goal_amount: 1000.00
+    currency: USD
+    is_active: 1
+    is_notify: 1
+
+  -
+    id: 9991
+    contact_id: 9999
+    status_id: 2 #Approved
+    title: Test PCP 9991
+    intro_text: Test
+    page_text: Test
+    donate_link_text: Donate
+    page_id: 1
+    page_type: event
+    pcp_block_id: 9998
+    is_thermometer: 1
+    is_honor_roll: 1
+    goal_amount: 5000.00
+    currency: USD
+    is_active: 1
+    is_notify: 1

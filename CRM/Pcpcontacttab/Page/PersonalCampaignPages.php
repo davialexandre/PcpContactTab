@@ -17,42 +17,28 @@ class CRM_Pcpcontacttab_Page_PersonalCampaignPages extends CRM_Core_Page {
     $action = array_sum(array_keys($links));
 
     $contact_id = CRM_Utils_Request::retrieve('cid', 'Positive');
-    $params[] = [$contact_id, 'Integer'];
-    $result = CRM_Core_DAO::executeQuery("
-      SELECT pcp.id,
-        pcp.title,
-        pcp.status_id,
-        pcp.goal_amount,
-        pcp.page_id,
-        pcp.page_type,
-        COALESCE(cp.title, e.title) as page_title,
-        COUNT(cs.id) as number_of_contributions,
-        SUM(cs.amount) as amount_raised,
-        c.contribution_page_id
-      FROM civicrm_pcp pcp
-        LEFT JOIN civicrm_contribution_page cp ON pcp.page_id = cp.id AND pcp.page_type = 'contribute'
-        LEFT JOIN civicrm_event e ON pcp.page_id = e.id AND pcp.page_type = 'event'
-        LEFT JOIN civicrm_contribution_soft cs ON pcp.id = cs.pcp_id
-        LEFT JOIN civicrm_contribution c ON cs.contribution_id = c.id
-      WHERE pcp.contact_id = %0
-      GROUP BY pcp.id
-    ", $params);
+    $pcps = civicrm_api3('PCP', 'get', array('contact_id' => $contact_id));
     $pages = array();
-    while($result->fetch()) {
-      $pages[$result->id] = array(
-        'id' => $result->id,
-        'title' => $result->title,
-        'status' => $status[$result->status_id],
-        'goal_amount' => $result->goal_amount,
-        'page_id' => $result->page_id,
-        'page_type' => $result->page_type,
-        'page_title' => $result->page_title,
-        'number_of_contributions' => $result->number_of_contributions,
-        'amount_raised' => is_null($result->amount_raised) ? 0 : $result->amount_raised,
-        'actions' => CRM_Core_Action::formLink($links, $action, array('id' => $result->id)),
-        'contribution_page_id' => $result->contribution_page_id
-      );
+    if(!empty($pcps['values'])) {
+      foreach($pcps['values'] as $pcp) {
+        $target_entity_info = CRM_Pcpcontacttab_BAO_PCP::getPcpBlockTargetEntityInfo($pcp['id'], $pcp['page_type']);
+        $pages[$pcp['id']] = array(
+            'id' => $pcp['id'],
+            'title' => $pcp['title'],
+            'status' => $status[$pcp['status_id']],
+            'goal_amount' => $pcp['goal_amount'],
+            'page_id' => $pcp['page_id'],
+            'page_type' => $pcp['page_type'],
+            'page_title' => CRM_PCP_BAO_PCP::getPcpPageTitle($pcp['id'], $pcp['page_type']),
+            'number_of_contributions' => CRM_Pcpcontacttab_BAO_PCP::getNumberOfContributions($pcp['id']),
+            'amount_raised' => CRM_Pcpcontacttab_BAO_PCP::getAmountRaised($pcp['id']),
+            'actions' => CRM_Core_Action::formLink($links, $action, array('id' => $pcp['id'])),
+            'target_type' => isset($target_entity_info['type']) ? $target_entity_info['type'] : null,
+            'target_id' => isset($target_entity_info['id']) ? $target_entity_info['id'] : null
+        );
+      }
     }
+
     $this->assign('pages', $pages);
 
     parent::run();

@@ -21,8 +21,8 @@
                         <td>{$page.status}</td>
                         <td>{$page.page_title}</td>
                         <td>
-                            {if isset($page.contribution_page_id) }
-                            <a href="{crmURL p='civicrm/contribute/search' q="reset=1&force=1&pid=`$page.page_id`" fe='true'}" title="{ts}View Contributions{/ts}">
+                            {if $page.target_type == 'contribute' }
+                            <a href="{crmURL p='civicrm/contribute/search' q="reset=1&force=1&pid=`$page.target_id`" fe='true'}" title="{ts}View Contributions{/ts}">
                                 {$page.number_of_contributions}
                             </a>
                             {else}
